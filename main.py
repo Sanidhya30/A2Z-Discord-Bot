@@ -6,10 +6,9 @@ from replit import db
 import datetime
 import pytz
 
-#MUSIC-bot play command
 #TIC-TAC-TOE
 #PRIVATE NOTE SETTING LIKE STICKY NOTES
-#gtn
+#gtn (add some feature like hint)
 #server-info, user-info
 
 

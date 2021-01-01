@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import os
-import requests  #to import api module
+#import requests  #to import api module
 import aiohttp  #to import api module
 import io
 import praw
