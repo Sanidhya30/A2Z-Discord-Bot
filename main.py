@@ -7,17 +7,17 @@ import datetime
 import pytz
 
 #MUSIC-bot play command
-#GIVEAWAY BOT  adding personal message when the user win or enter the giveaway
 #TIC-TAC-TOE
 #PRIVATE NOTE SETTING LIKE STICKY NOTES
 #gtn
+#server-info, user-info
 
 
 def get_prefix(client, message):
     if str(message.guild.id) in db.keys():
         return db[f"{str(message.guild.id)}"]
     else:
-        db[f"{str(message.guild.id)}"] = '.'
+        db[f"{str(message.guild.id)}"] = '-'
         return '.'
 
 
@@ -53,7 +53,7 @@ async def on_command_error(ctx, error):
 @client.event
 async def on_message(ctx):
     if client.user.mentioned_in(ctx):
-        await ctx.channel.send(f"My prefix is {get_prefix(client, ctx)}")
+        await ctx.channel.send(f"My prefix is `{get_prefix(client, ctx)}`")
     else:
         await client.process_commands(ctx)
 
