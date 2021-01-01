@@ -115,14 +115,20 @@ class Giveaway(commands.Cog):
             return
 
         winners = random.choices(users, k=int(answers[3]))
-        #print(type(winners))
+        print((winners))
+
+        #[{submission.title}](https://www.reddit.com/r/memes/comments/{submission}/)
 
         new_winner_var = ""
-
+        new_embed = discord.Embed(description = f"**Congratulations** you won a giveaway in {channel.mention}",colour = discord.Colour.gold())
+        #new_embed.add_field(f"Congratulations")
         for i in (winners):
+            await i.send(embed=new_embed)
             new_winner_var += "<@" + str(i.id) + "> "
 
         #print(winners[0].id)
+
+        
 
         await channel.send(
             f"🎉*Congratulations* {new_winner_var} you won **{answers[2]}**!!!🎉"
@@ -194,8 +200,11 @@ class Giveaway(commands.Cog):
         winners = random.choices(users, k=int(answers[2]))
 
         new_winner_var = ""
+        new_winner_var = ""
+        new_embed = discord.Embed(description = f"**Congratulations** you won a giveaway in {channel.mention}",colour = discord.Colour.gold())
 
         for i in (winners):
+            await i.send(embed=new_embed)
             new_winner_var += "<@" + str(i.id) + "> "
 
         await channel.send(

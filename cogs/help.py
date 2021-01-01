@@ -62,6 +62,14 @@ class Help(commands.Cog):
                 name='🤝 unban',
                 value='`Unban member who is banned from the server`',
                 inline=True)
+            embed.add_field(
+                name='🔒 lockdown',
+                value='`Lockdown the channel`',
+                inline=True)
+            embed.add_field(
+                name='🔓 unlock',
+                value='`Unlocks the channel`',
+                inline=True)
         elif (message == 'nsfw'):
             embed.add_field(
                 name='🤤 rnsfw', value='`Fetch Random nsfw`', inline=True)

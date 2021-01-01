@@ -6,11 +6,11 @@ from replit import db
 import datetime
 import pytz
 
-#to get bot prefix when bot is mentioned
-#MUSIC-bot
+#MUSIC-bot play command
 #GIVEAWAY BOT  adding personal message when the user win or enter the giveaway
 #TIC-TAC-TOE
 #PRIVATE NOTE SETTING LIKE STICKY NOTES
+#gtn
 
 
 def get_prefix(client, message):
