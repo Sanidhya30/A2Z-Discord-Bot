@@ -45,7 +45,7 @@ class Giveaway(commands.Cog):
             title="🎉Giveaway🎉", colour=discord.Colour.magenta())
 
         for i in questions:
-            embed.set_footer(text="Type **cancel** to cancel the giveaway")
+            embed.set_footer(text="Type 'cancel' to cancel the giveaway")
             embed.clear_fields()
             embed.add_field(
                 name=f"{i}", value="(Please answer within 30 seconds)")

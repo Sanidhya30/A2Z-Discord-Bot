@@ -8,8 +8,8 @@ import pytz
 
 #TIC-TAC-TOE
 #PRIVATE NOTE SETTING LIKE STICKY NOTES
-#gtn (add some feature like hint)
 #server-info, user-info
+#giveaway store in the database
 
 
 def get_prefix(client, message):
@@ -51,16 +51,22 @@ async def on_command_error(ctx, error):
 
 @client.event
 async def on_message(ctx):
-    if client.user.mentioned_in(ctx):
+    if client.user.mentioned_in(ctx):   
         await ctx.channel.send(f"My prefix is `{get_prefix(client, ctx)}`")
     else:
         await client.process_commands(ctx)
 
 @client.command()
+@commands.has_permissions(administrator = True)
 async def prefix(ctx, pre):  #for setting the server prefix
     db[f"{str(ctx.guild.id)}"] = pre
     #print(db[f"{str(ctx.guild.id)}"])
     await ctx.send(f'The new prefix is `{pre}`')
+
+@prefix.error
+async def kick_error(ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send('Sorry you are not allowed to use this command.')
 
 
 for filename in os.listdir('./cogs'):

@@ -25,6 +25,8 @@ class Help(commands.Cog):
                 name=':musical_note: Music', value='`help music`', inline=True)
             embed.add_field(
                 name=':tada: Giveaway', value='`help giveaway`', inline=True)
+            embed.add_field(
+                name='🔢 Guess the Number', value='`help gtn`', inline=True)
         elif (message == 'fun'):
             embed.add_field(
                 name=':1234: numbers,number',
@@ -119,6 +121,14 @@ class Help(commands.Cog):
         elif (message == 'giveaway'):
             embed.add_field(name = ':tada: gstart', value='`Start a giveaway in the specified channel and ends at the given time`', inline = False)
             embed.add_field(name = '👑 greroll', value='`Reroll the giveaway winners`', inline = False)
+        elif (message == 'gtn'):
+            embed.add_field(
+                name=':1234: gtnstart',
+                value='`A simple game where the user have to guess the number`',
+                inline=True)
+        else:
+            await ctx.send('You entered a wrong command!!')
+            return
 
         embed.set_footer(
             text='Dont forget to use prefix before using commands')

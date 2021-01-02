@@ -28,9 +28,10 @@ class GTN(commands.Cog):
 
                 #await ctx.channel.send(embed=new_embed)
 
-                await ctx.author.send(
-                    f'🎉Congratulations you won the gtn event in {ctx.channel.mention}🎉'
-                )
+                embed = discord.Embed(
+                    description=f'🎉Congratulations you won the gtn event in {ctx.channel.mention}🎉',
+                    colour=discord.Colour.gold())
+                await ctx.author.send(embed=embed)
 
     #GTN COMMANDS
     @commands.command()
@@ -47,10 +48,10 @@ class GTN(commands.Cog):
             return msg.author == ctx.author and msg.channel == ctx.channel
 
         embed = discord.Embed(
-            title='🔢Guess The Number🔢', colour=discord.Colour.dark_teal())
+            title='🔢 Guess The Number 🔢', colour=discord.Colour.dark_teal())
 
         for i in questions:
-            embed.set_footer(text="Type **cancel** to cancel the gtn")
+            embed.set_footer(text="Type 'cancel' to cancel the gtn")
             embed.clear_fields()
             embed.add_field(
                 name=f"{i}", value="(Please answer within 30 seconds)")
@@ -107,7 +108,7 @@ class GTN(commands.Cog):
             await channel.set_permissions(
                 ctx.guild.default_role, send_messages=True)
             new_embed.title = 'Game has started'
-            new_embed.description = f'The range is from {answers[1]} to {answers[2]}'
+            new_embed.description = f'The range is from `{answers[1]}` to `{answers[2]}`'
             await channel.send(embed=new_embed)
 
 
