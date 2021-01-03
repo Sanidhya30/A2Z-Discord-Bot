@@ -103,7 +103,7 @@ class GTN(commands.Cog):
                 ctx.guild.default_role, send_messages=False)
             await channel.send(embed=new_embed)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(60)
 
             await channel.set_permissions(
                 ctx.guild.default_role, send_messages=True)
