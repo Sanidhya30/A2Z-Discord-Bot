@@ -1,30 +1,28 @@
 import discord
 from discord.ext import commands
 import os
-import requests  #to import api module
+#import requests  #to import api module
 import aiohttp  #to import api module
 import io
 import praw
 
 
-def get_number_facts():
+'''async def get_number_facts():
     response = requests.get("http://numbersapi.com/random/trivia?json")
     #print(response.status_code)
     temp = response.json()
+    #print(temp)
     #print(type(temp))
     #print(temp['text'])
     #print(temp[0]['text'])
     #json_data = json.loads(response.text)
     #print(json_data,type(json_data))
-    return (temp['text'])
-
-
-def get_general_facts():
+    return (temp['text'])'''
+'''def get_general_facts():
     response = requests.get("https://useless-facts.sameerkumar.website/api")
     temp = response.json()
     #print(temp)
-    return temp['data']
-
+    return temp['data']'''
 
 reddit = praw.Reddit(
     client_id=os.getenv("reddit_client_id"),
@@ -51,14 +49,24 @@ class Fun(commands.Cog):
     async def numbers(
             self, ctx
     ):  #Use {prefix}number,{prefix}numbers, Show random fact about number
-        temp = get_number_facts()
-        await ctx.send(f"*Did You Know* - {temp}")
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                "http://numbersapi.com/random/trivia?json")
+
+        temp = await response.json()
+        #temp = get_number_facts()
+        await ctx.send(f"*Did You Know* - {temp['text']}")
 
     @commands.command(aliases=['fact'])
     async def facts(self,
                     ctx):  #Use {prefix}fact,{prefix}facts, Show random facts
-        temp = get_general_facts()
-        await ctx.send(f"*Did You Know* - {temp}")
+        #temp = get_general_facts()
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                "https://useless-facts.sameerkumar.website/api")
+
+        temp = await response.json()
+        await ctx.send(f"*Did You Know* - {temp['data']}")
 
     @commands.command()
     async def math(
@@ -161,8 +169,7 @@ class Fun(commands.Cog):
 
         embed.set_image(url=submission.url)
         embed.set_footer(
-            text=f'Requested by {ctx.author}',
-            icon_url=ctx.author.avatar_url)
+            text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
 
         await ctx.send(embed=embed)
 

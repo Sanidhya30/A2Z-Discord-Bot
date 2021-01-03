@@ -83,11 +83,10 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send('Sorry you are not allowed to use this command.')
 
-
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def slowmode(self, ctx, amount=0):
-        await ctx.channel.edit(slowmode_delay = int(amount))
+        await ctx.channel.edit(slowmode_delay=int(amount))
         #print(ctx.channel.slowmode_delay)
         await ctx.send(f'The slowmode is set to {amount} seconds')
 
@@ -95,7 +94,32 @@ class Moderation(commands.Cog):
     async def slowmode_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send('Sorry you are not allowed to use this command.')
-    
+
+    @commands.command()
+    @commands.has_permissions(manage_channels=True)
+    async def lockdown(self, ctx):
+        await ctx.channel.set_permissions(
+            ctx.guild.default_role, send_messages=False)
+        await ctx.send(ctx.channel.mention + " ***is now in lockdown.***")
+
+    @lockdown.error
+    async def lockdown_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send('Sorry you are not allowed to use this command.')
+
+    @commands.command()
+    @commands.has_permissions(manage_channels=True)
+    async def unlock(self, ctx):
+        await ctx.channel.set_permissions(
+            ctx.guild.default_role, send_messages=True)
+        await ctx.send(ctx.channel.mention + " ***has been unlocked.***")
+        #print(ctx.author)
+        #await ctx.author.send('yo')
+
+    @unlock.error
+    async def unlock_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send('Sorry you are not allowed to use this command.')
 
     '''@commands.command()
     async def display(ctx):
