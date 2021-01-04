@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from PIL import Image, ImageDraw
-import io
 import asyncio
 
 
@@ -9,7 +8,7 @@ def display_board(board):
     blankBoard = """
 |-----------------|
 |     |     |     |
-|  7  |  8  |  9  |
+|  1  |  2  |  3  |
 |     |     |     |
 |-----------------|
 |     |     |     |
@@ -17,10 +16,11 @@ def display_board(board):
 |     |     |     |
 |-----------------|
 |     |     |     |
-|  1  |  2  |  3  |
+|  7  |  8  |  9  |
 |     |     |     |
 |-----------------|
 """
+    #blankBoard = blankBoard.encode('utf-8')
 
     for i in range(1, 10):
         if (board[i] == 'O' or board[i] == 'X'):
@@ -31,11 +31,12 @@ def display_board(board):
 
 
 def board_to_image(blankBoard):
-    img = Image.new('RGB', (140, 220), color=(41, 40, 38))
+    img = Image.new('RGB', (140, 220), color=(0, 21, 79))
 
     d = ImageDraw.Draw(img)
-    d.text((13, 0), blankBoard, fill=(249, 212, 66))
+    d.text((13, 0), blankBoard, fill=(244, 175, 27))
 
+    img = img.resize((250, 280))
     img.save('game_start.png')
 
 
@@ -81,9 +82,25 @@ class TicTacToe(commands.Cog):
         embed.description = 'Waiting for another player, please react to start the game'
 
         msg = await ctx.send(embed=embed)
-        await msg.add_reaction("❌")
+        await msg.add_reaction("☑️")
 
-        await asyncio.sleep(60)  #change it to 60
+        player_1 = ctx.author
+
+        def check(reaction, user):
+            return user != player_1 and user != self.client.user and (str(
+                reaction.emoji) == '☑️')
+
+        try:  #Waiting for the reaction to be added
+            reaction, user = await self.client.wait_for(
+                'reaction_add', timeout=45.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.send(
+                "Nobody reacted to the message. Terminating the game!!")
+            return
+        else:
+            player_2 = user
+        
+        '''await asyncio.sleep(5)  #change it to 60
 
         #print(self.client.user, ctx.author)
         new_msg = await ctx.channel.fetch_message(msg.id)
@@ -102,12 +119,13 @@ class TicTacToe(commands.Cog):
             return
 
         player_1 = ctx.author
-        player_2 = users[0]
+        player_2 = users[0]'''
+
         embed.description = f"Game is starting in 5 seconds between {player_1.mention}(❌) V/S {player_2.mention}(⭕)"
 
-        await new_msg.clear_reactions()
+        await msg.clear_reactions()
 
-        await new_msg.edit(embed=embed)
+        await msg.edit(content = f'{player_1.mention} V/S {player_2.mention}',embed=embed)
 
         await asyncio.sleep(5)
 
@@ -119,7 +137,8 @@ class TicTacToe(commands.Cog):
         # Set the game up here
         game_on = full_board_check(board)
         player_number = 1
-        new_emoji_list = emoji_list.copy() #A temp emoji list so that we can remove the position that have already been used
+        new_emoji_list = emoji_list.copy(
+        )  #A temp emoji list so that we can remove the position that have already been used
 
         while not game_on:
             blankBoard = display_board(board)
@@ -128,28 +147,31 @@ class TicTacToe(commands.Cog):
             if player_number % 2 == 1:
                 embed.description = f'{player_1.mention} your turn'
                 embed.set_footer(
-                        text=f'{player_1} your marker is ❌',
-                        icon_url=player_1.avatar_url)
+                    text=f'{player_1} your marker is ❌',
+                    icon_url=player_1.avatar_url)
             else:
                 embed.description = f'{player_2.mention} your turn'
                 embed.set_footer(
-                        text=f'{player_2} your marker is ⭕',
-                        icon_url=player_1.avatar_url)
+                    text=f'{player_2} your marker is ⭕',
+                    icon_url=player_2.avatar_url)
 
             embed.set_image(url="attachment://game_start.png")
             #print(blankBoard)
 
             f = discord.File('game_start.png')
+            await msg.delete()
             msg = await ctx.send(file=f, embed=embed)
 
             for i in new_emoji_list:
                 await msg.add_reaction(i)
 
             def check_1(reaction, user):
-                return user == player_1 and (str(reaction.emoji) in new_emoji_list)
+                return user == player_1 and (str(
+                    reaction.emoji) in new_emoji_list)
 
             def check_2(reaction, user):
-                return user == player_2 and (str(reaction.emoji) in new_emoji_list)
+                return user == player_2 and (str(
+                    reaction.emoji) in new_emoji_list)
 
             try:  #Waiting for the reaction to be added
                 if player_number % 2 == 1:
@@ -183,18 +205,17 @@ class TicTacToe(commands.Cog):
                     if player_number % 2 == 1:
                         embed.description = f'🎉Congratulations{player_1.mention} you won the game!!!'
                         embed.set_footer(
-                        text=f'{player_1}',
-                        icon_url=player_1.avatar_url)
+                            text=f'{player_1}', icon_url=player_1.avatar_url)
                     else:
                         embed.description = f'🎉Congratulations{player_2.mention} you won the game!!!'
                         embed.set_footer(
-                        text=f'{player_2}',
-                        icon_url=player_2.avatar_url)
+                            text=f'{player_2}', icon_url=player_2.avatar_url)
 
                     embed.set_image(url="attachment://game_start.png")
 
                     f = discord.File('game_start.png')
-                    await ctx.send(file=f , embed=embed)
+                    await msg.delete()
+                    msg = await ctx.send(file=f, embed=embed)
                     return
                     break
 
@@ -202,10 +223,17 @@ class TicTacToe(commands.Cog):
                 game_on = full_board_check(board)
                 #print(emoji_list,new_emoji_list)
 
-        embed.description = 'The game ended in a tie!'
-        embed.set_image(url = 'https://thumbs.dreamstime.com/b/better-luck-next-time-rubber-stamp-over-white-background-88415080.jpg')
+        blankBoard = display_board(board)
+        board_to_image(blankBoard)
+        embed.set_image(url="attachment://game_start.png")
+        f = discord.File('game_start.png')
 
-        await ctx.send(embed=embed)
+        embed.description = f'The game ended in a tie!!! {player_1.mention}(❌) V/S {player_2.mention}(⭕)'
+        embed.set_footer(
+            text=discord.Embed.Empty, icon_url=discord.Embed.Empty)
+
+        await msg.delete()
+        msg = await ctx.send(file=f, embed=embed)
 
 
 def setup(client):

@@ -27,6 +27,8 @@ class Help(commands.Cog):
                 name=':tada: Giveaway', value='`help giveaway`', inline=True)
             embed.add_field(
                 name='🔢 Guess the Number', value='`help gtn`', inline=True)
+            embed.add_field(
+                name='❌TIC-TAC-TOE⭕', value='`help tictactoe`', inline=True)
         elif (message == 'fun'):
             embed.add_field(
                 name=':1234: numbers,number',
@@ -36,8 +38,8 @@ class Help(commands.Cog):
                 name='😲 facts,fact',
                 value='`Fetch you some random facts`',
                 inline=True)
-            embed.add_field(
-                name='📐 math', value='`Solve any equation for you`', inline=True)
+            '''embed.add_field(
+                name='📐 math', value='`Solve any equation for you`', inline=True)'''
             embed.add_field(
                 name='🗣 tts', value='`Text-to-speech in english`', inline=True)
             embed.add_field(
@@ -125,6 +127,11 @@ class Help(commands.Cog):
             embed.add_field(
                 name=':1234: gtnstart',
                 value='`A simple game where the user have to guess the number`',
+                inline=True)
+        elif (message == 'tictactoe'):
+            embed.add_field(
+                name='xox',
+                value='`A simple tic tac toe game between two users, where all they need to do is to react with a number they want to put their marker.`',
                 inline=True)
         else:
             await ctx.send('You entered a wrong command!!')
