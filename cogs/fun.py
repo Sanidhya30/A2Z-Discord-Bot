@@ -68,14 +68,14 @@ class Fun(commands.Cog):
         temp = await response.json()
         await ctx.send(f"*Did You Know* - {temp['data']}")
 
-    @commands.command()
+    '''@commands.command()
     async def math(
             self, ctx, *,
             question):  #Use {prefix}math equation, Solve the given equation
         try:
             await ctx.send(eval(question))
         except:
-            await ctx.send("Type a correct equation!!!!")
+            await ctx.send("Type a correct equation!!!!")'''
 
     @commands.command()
     async def tts(
