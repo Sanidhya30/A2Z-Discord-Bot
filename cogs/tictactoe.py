@@ -2,6 +2,11 @@ import discord
 from discord.ext import commands
 from PIL import Image, ImageDraw
 import asyncio
+import pymongo
+import os
+
+mongo_client = pymongo.MongoClient(os.getenv("mongo_uri"))
+xox_db = mongo_client.A2Z_discord.tictactoe_result
 
 
 def display_board(board):
@@ -99,7 +104,6 @@ class TicTacToe(commands.Cog):
             return
         else:
             player_2 = user
-        
         '''await asyncio.sleep(5)  #change it to 60
 
         #print(self.client.user, ctx.author)
@@ -125,7 +129,8 @@ class TicTacToe(commands.Cog):
 
         await msg.clear_reactions()
 
-        await msg.edit(content = f'{player_1.mention} V/S {player_2.mention}',embed=embed)
+        await msg.edit(
+            content=f'{player_1.mention} V/S {player_2.mention}', embed=embed)
 
         await asyncio.sleep(5)
 
@@ -206,10 +211,34 @@ class TicTacToe(commands.Cog):
                         embed.description = f'🎉Congratulations{player_1.mention} you won the game!!!'
                         embed.set_footer(
                             text=f'{player_1}', icon_url=player_1.avatar_url)
+                        xox_db.update_one({
+                            "user_id": player_1.id
+                        }, {"$inc": {
+                            "games.win": 1
+                        }},
+                                          upsert=True)
+                        xox_db.update_one({
+                            "user_id": player_2.id
+                        }, {"$inc": {
+                            "games.lose": 1
+                        }},
+                                          upsert=True)
                     else:
                         embed.description = f'🎉Congratulations{player_2.mention} you won the game!!!'
                         embed.set_footer(
                             text=f'{player_2}', icon_url=player_2.avatar_url)
+                        xox_db.update_one({
+                            "user_id": player_1.id
+                        }, {"$inc": {
+                            "games.lose": 1
+                        }},
+                                          upsert=True)
+                        xox_db.update_one({
+                            "user_id": player_2.id
+                        }, {"$inc": {
+                            "games.win": 1
+                        }},
+                                          upsert=True)
 
                     embed.set_image(url="attachment://game_start.png")
 
@@ -234,6 +263,19 @@ class TicTacToe(commands.Cog):
 
         await msg.delete()
         msg = await ctx.send(file=f, embed=embed)
+
+        xox_db.update_one({
+            "user_id": player_1.id
+        }, {"$inc": {
+            "games.tie": 1
+        }},
+                          upsert=True)
+        xox_db.update_one({
+            "user_id": player_2.id
+        }, {"$inc": {
+            "games.tie": 1
+        }},
+                          upsert=True)
 
 
 def setup(client):

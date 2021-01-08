@@ -2,7 +2,12 @@ import discord
 from discord.ext import commands
 import random
 import asyncio
-from replit import db
+import pymongo
+import os
+#from replit import db
+
+mongo_client = pymongo.MongoClient(os.getenv("mongo_uri"))
+gtn_db = mongo_client.A2Z_discord.gtn_ongoing_game
 
 
 class GTN(commands.Cog):
@@ -12,26 +17,52 @@ class GTN(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, ctx):
         #print(ctx.content)
-        if ctx.channel.id in db.keys() and ctx.content.isdigit():
-            if int(ctx.content) == db[ctx.channel.id]:
+
+        #by pymongo
+
+        gtn_db.find_one({"channel_id": ctx.channel.id})
+
+        if (gtn_db.find_one({
+                "channel_id": ctx.channel.id
+        }) is not None) and ctx.content.isdigit():
+            temp_db = gtn_db.find_one({"channel_id": ctx.channel.id})
+            if int(ctx.content) == temp_db.get("number"):
                 new_embed = discord.Embed(
-                    description=f'🎉{ctx.author.mention} guessed it right!The number was {db[ctx.channel.id]}',
+                    description=
+                    f'🎉{ctx.author.mention} guessed it right!The number was {temp_db.get("number")}',
                     colour=discord.Colour.gold())
 
-                new_embed.set_author(name = ctx.author, icon_url=ctx.author.avatar_url)
+                new_embed.set_author(
+                    name=ctx.author, icon_url=ctx.author.avatar_url)
 
                 await ctx.channel.set_permissions(
                     ctx.guild.default_role, send_messages=False)
                 await ctx.channel.send(embed=new_embed)
 
-                del db[ctx.channel.id]
-
-                #await ctx.channel.send(embed=new_embed)
+                gtn_db.delete_one({"channel_id": ctx.channel.id})
 
                 embed = discord.Embed(
-                    description=f'🎉Congratulations you won the gtn event in {ctx.channel.mention}🎉',
+                    description=
+                    f'🎉Congratulations you won the gtn event in {ctx.channel.mention}🎉',
                     colour=discord.Colour.gold())
                 await ctx.author.send(embed=embed)
+
+        #by replit database
+        '''if ctx.channel.id in db.keys() and ctx.content.isdigit():
+            if int(ctx.content) == db[ctx.channel.id]:
+                new_embed = discord.Embed(
+                    description=
+                    f'🎉{ctx.author.mention} guessed it right!The number was {db[ctx.channel.id]}',
+                    colour=discord.Colour.gold())
+
+                new_embed.set_author(
+                    name=ctx.author, icon_url=ctx.author.avatar_url)
+
+                await ctx.channel.set_permissions(
+                    ctx.guild.default_role, send_messages=False)
+                await ctx.channel.send(embed=new_embed)
+
+                del db[ctx.channel.id]'''
 
     #GTN COMMANDS
     @commands.command()
@@ -88,7 +119,14 @@ class GTN(commands.Cog):
             return
         else:
             number = random.randint(int(answers[1]), int(answers[2]))
-            db[channel_id] = number
+            gtn_db.update_one({
+                "channel_id": channel_id
+            }, {"$set": {
+                "channel_id": channel_id,
+                "number": number
+            }},
+                              upsert=True)
+            #db[channel_id] = number  #replit database
 
             new_embed = discord.Embed(
                 description=
@@ -103,7 +141,7 @@ class GTN(commands.Cog):
                 ctx.guild.default_role, send_messages=False)
             await channel.send(embed=new_embed)
 
-            await asyncio.sleep(60)
+            await asyncio.sleep(1)
 
             await channel.set_permissions(
                 ctx.guild.default_role, send_messages=True)
